@@ -9,7 +9,7 @@ public class GameFrame extends JFrame {
     public GameFrame() {
         setTitle("Purr-fect Strike");
         setSize(1440, 900);
-        setResizable(false);
+        setResizable(true);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
