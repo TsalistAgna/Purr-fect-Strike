@@ -15,7 +15,9 @@ public class GamePanel extends JComponent {
 
     private BufferedImage image; 
     private Graphics2D g2;
-    private BufferedImage backgroundImage; 
+    private BufferedImage backgroundImage;
+
+    private Cat player;
 
     public void start() {
         width = getWidth();
@@ -39,6 +41,7 @@ public class GamePanel extends JComponent {
                 }
             }
         });
+        initObjectGame();
         thread.start();
     }
 
@@ -51,6 +54,10 @@ public class GamePanel extends JComponent {
         }
     }
 
+    private void initObjectGame(){
+        player = new Cat();
+    }
+
     private void drawBackground() {
         if (backgroundImage != null) {
             g2.drawImage(backgroundImage, 0, 0, width, height, null);
@@ -61,7 +68,7 @@ public class GamePanel extends JComponent {
     }
 
     private void drawGame() {
-        
+        player.draw(g2);
     }
 
     private void render() {
