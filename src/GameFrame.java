@@ -10,7 +10,7 @@ public class GameFrame extends JFrame {
     public GameFrame() {
         setTitle("Purr-fect Strike");
         setSize(1440, 900);
-        setResizable(true);
+        setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -30,7 +30,7 @@ public class GameFrame extends JFrame {
 
     private void showGamePanel() {
         try {
-            gamePanel.loadBackground("Assets/Images/Background/bg2.png");
+            gamePanel.loadBackground("Assets\\Images\\Background\\bg biru.png");
             System.out.println("Background berhasil dimuat.");
             gamePanel.start();
             System.out.println("GamePanel dimulai.");
