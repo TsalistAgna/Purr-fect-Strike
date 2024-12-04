@@ -122,10 +122,10 @@ public class GamePanel extends JComponent {
                         if (shotTime == 0) {
                             lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 5, 3f));
                         } else {
-                            lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 20, 3f));
+                            lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 10, 3f));
                         }
                         shotTime++;
-                        if (shotTime == 10) {
+                        if (shotTime == 5) {
                             shotTime = 0;
                         }
                     } else {
