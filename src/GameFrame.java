@@ -1,10 +1,11 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
+import javax.swing.*;
 
 public class GameFrame extends JFrame {
+
+    private CardLayout cardLayout;
+    private JPanel containerPanel;
+    private GamePanel gamePanel;
 
     public GameFrame() {
         setTitle("Purr-fect Strike");
@@ -14,23 +15,31 @@ public class GameFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        GamePanel gamePanel = new GamePanel();
-        add(gamePanel);
+        cardLayout = new CardLayout();
+        containerPanel = new JPanel(cardLayout);
 
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                try {
-                    gamePanel.loadBackground("Assets/Images/Background/bg2.png");
-                    System.out.println("Background berhasil dimuat.");
-                    gamePanel.start();
-                    System.out.println("GamePanel dimulai.");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    System.out.println("Error: " + ex.getMessage());
-                }
-            }
-        });
+        MainMenuPanel mainMenuPanel = new MainMenuPanel(this::showGamePanel);
+        containerPanel.add(mainMenuPanel, "MainMenu");
+
+        gamePanel = new GamePanel();
+        containerPanel.add(gamePanel, "GamePanel");
+
+        add(containerPanel);
         setVisible(true);
+    }
+
+    private void showGamePanel() {
+        try {
+            gamePanel.loadBackground("Assets/Images/Background/bg2.png");
+            System.out.println("Background berhasil dimuat.");
+            gamePanel.start();
+            System.out.println("GamePanel dimulai.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.println("Error: " + ex.getMessage());
+        }
+
+        cardLayout.show(containerPanel, "GamePanel");
+        gamePanel.requestFocusInWindow();
     }
 }

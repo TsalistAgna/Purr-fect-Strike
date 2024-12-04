@@ -1,12 +1,13 @@
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GamePanel extends JComponent {
     private final int FPS = 60;
@@ -16,11 +17,13 @@ public class GamePanel extends JComponent {
     private Thread thread;
     private boolean start = true;
 
-    private BufferedImage image; 
+    private BufferedImage image;
     private Graphics2D g2;
     private BufferedImage backgroundImage;
     private Key key;
+    private int shotTime;
 
+    private List<Laser> lasers = new ArrayList<>();
     private Cat player;
 
     public void start() {
@@ -31,13 +34,13 @@ public class GamePanel extends JComponent {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         
-        // initObjectGame();
-        // initKeyboard();
+        initObjectGame();
+        initKeyboard();
 
         thread = new Thread(() -> {
             while (start) {
                 long startTime = System.nanoTime();
-                drawBackground(); 
+                drawBackground();
                 drawGame();
                 render();
                 long time = System.nanoTime() - startTime;
@@ -50,6 +53,7 @@ public class GamePanel extends JComponent {
         });
         initObjectGame();
         initKeyboard();
+        initLasers();
         thread.start();
     }
     
@@ -101,7 +105,7 @@ public class GamePanel extends JComponent {
                     key.setKey_k(false);
                 }
             }
-        }); 
+        });
         new Thread(new Runnable(){
             @Override
             public void run(){
@@ -114,14 +118,55 @@ public class GamePanel extends JComponent {
                     if(key.isKanan()){
                         angle += s ;
                     }
+                    if (key.isKey_j() || key.isKey_k()) {
+                        if (shotTime == 0) {
+                            lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                        } else {
+                            lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 20, 3f));
+                        }
+                        shotTime++;
+                        if (shotTime == 10) {
+                            shotTime = 0;
+                        }
+                    } else {
+                        shotTime = 0;
+                    }
+                    if (key.isSpasi()) {
+                        player.speedUp();
+                    } else {
+                        player.speedDown();
+                    }
+                    player.update();
                     player.changeAngle(angle);
+                    repaint();
                     sleep(5);
 
-                }   
+                }
             }
         }).start();
     }
 
+    private void initLasers(){
+        new Thread(new Runnable()  {
+            @Override
+            public void run(){
+                while (start) {
+                    for (int i=0; i < lasers.size(); i++) {
+                        Laser laser = lasers.get(i);
+                        if (laser != null) {
+                            laser.update();
+                            if(!laser.check(width, height)){
+                                lasers.remove(laser);
+                            } else {
+                                lasers.remove(laser);
+                            }
+                        }
+                        sleep(1);
+                    }
+                }
+            }
+        }).start();
+    }
 
     public void loadBackground(String filePath) {
         try {
@@ -145,8 +190,14 @@ public class GamePanel extends JComponent {
 
     private void drawGame() {
         if (player != null) {
-            System.out.println("Menggambar kucing...");
+            // System.out.println("Menggambar kucing...");
             player.draw(g2);
+            for(int i = 0; i < lasers.size(); i++){
+                Laser laser = lasers.get(i);
+                if (laser != null) {
+                    laser.draw(g2);
+                }
+            }
         }
     }
     

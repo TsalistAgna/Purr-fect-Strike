@@ -38,7 +38,7 @@ public class Key {
     }
 
     public boolean isKey_k(){
-        return key_j;
+        return key_k;
     }
 
     public void setKey_k(boolean key_k){
