@@ -26,4 +26,19 @@ public class DatabaseConnection {
         }
         return cats;
     }
+
+    public static ArrayList<Asset> getMice() {
+        ArrayList<Asset> mice = new ArrayList<>();
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+            String query = "SELECT nama, path_image FROM tikus_image";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                mice.add(new Asset(rs.getString("nama"), rs.getString("path_image")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mice;
+    }
+    
 }

@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import javax.swing.*;
 
@@ -7,8 +9,12 @@ public class MainMenuPanel extends JPanel {
     private int currentCatIndex = 0;
     private JLabel catImageLabel;
     private JLabel catNameLabel;
+    private Key key; 
+    private Runnable onStartGame; 
 
     public MainMenuPanel(Runnable onStartGame) {
+        this.onStartGame = onStartGame;
+        this.key = new Key(); 
         cats = DatabaseConnection.getCats();
 
         setLayout(new GridBagLayout());
@@ -83,6 +89,53 @@ public class MainMenuPanel extends JPanel {
 
         if (!cats.isEmpty()) {
             updateCatDisplay();
+        }
+
+        addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                handleKeyPressed(e.getKeyCode());
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                handleKeyReleased(e.getKeyCode());
+            }
+        });
+        setFocusable(true);
+    }
+
+    private void handleKeyPressed(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.VK_RIGHT:
+                key.setKanan(true);
+                showNextCat();
+                break;
+            case KeyEvent.VK_LEFT:
+                key.setKiri(true);
+                showPreviousCat();
+                break;
+            case KeyEvent.VK_ENTER:
+                key.setSpasi(true);
+                onStartGame.run();
+                break;
+        }
+    }
+
+    private void handleKeyReleased(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.VK_RIGHT:
+                key.setKanan(false);
+                break;
+            case KeyEvent.VK_LEFT:
+                key.setKiri(false);
+                break;
+            case KeyEvent.VK_ENTER:
+                key.setSpasi(false);
+                break;
         }
     }
 
