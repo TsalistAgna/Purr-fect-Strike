@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Area;
+import java.awt.image.BaseMultiResolutionImage;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class GamePanel extends JComponent {
     private List<Laser> lasers = new ArrayList<>();
     private Cat player = new Cat();
     private List<Mice> mice = new ArrayList<>();
+    private List<Effect> effects;
 
     public void start() {
         width = getWidth();
@@ -45,6 +47,7 @@ public class GamePanel extends JComponent {
                 long startTime = System.nanoTime();
                 drawBackground();
                 drawGame();
+                // paintComponents(g2);
                 render();
                 long time = System.nanoTime() - startTime;
     
@@ -77,6 +80,7 @@ public class GamePanel extends JComponent {
     private void initObjectGame() {
         player.changeLocation(150, 150);
         System.out.println("Lokasi kucing: " + player.getX() + ", " + player.getY());
+        effects = new ArrayList<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -186,7 +190,18 @@ public class GamePanel extends JComponent {
                 Area area = new Area(laser.getShape());
                 area.intersect(mouse.getShape());
                 if (!area.isEmpty()) {
-                    mice.remove(mouse);
+                    effects.add(new Effect(laser.getCenterX(), laser.getCenterY(), 3, 5, 60, 0.5f, new Color (230, 207, 105)));
+                    if (true ){
+                        mice.remove(mouse);
+                        double x = mouse.getX() + Mice.MICE_SIZE/2;
+                        double y = mouse.getY() + Mice.MICE_SIZE/2;
+                        effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color (32, 178, 169)));
+                        effects.add(new Effect(x, y, 5, 5, 75, 0.01f, new Color (32, 178, 169)));
+                        effects.add(new Effect(x, y, 10, 10, 100, 0.3f, new Color (230, 207, 105)));
+                        effects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color (255, 70, 70)));
+                        effects.add(new Effect(x, y, 10, 5, 100, 0.2f, new Color (255, 255, 255)));
+                    }
+                    
                     lasers.remove(laser);
                 }
             }
@@ -209,8 +224,20 @@ public class GamePanel extends JComponent {
                                 lasers.remove(laser);
                             }
                         }
-                        sleep(1);
                     }
+                    for (int i = 0; i < effects.size(); i++){
+                        Effect eff = effects.get(i);
+                        if (eff != null){
+                            eff.update();
+                            if (!eff.check()){
+                                effects.remove(eff);
+                            }else{
+                                effects.remove(eff);
+                            }
+                        }
+                        
+                    }
+                    sleep(1);
                 }
             }
         }).start();
@@ -250,6 +277,12 @@ public class GamePanel extends JComponent {
             Mice mouse = mice.get(i);
             if (mouse != null) {
                 mouse.draw(g2);
+            }
+        }
+        for (int i = 0; i < effects.size(); i++){
+            Effect eff = effects.get(i);
+            if (eff != null){
+                eff.draw(g2);
             }
         }
     }
