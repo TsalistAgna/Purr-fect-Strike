@@ -4,6 +4,7 @@ public class Key {
     private boolean spasi;
     private boolean key_j;
     private boolean key_k;
+    private boolean key_enter;
 
     public boolean isKanan(){
         return kanan;
@@ -43,6 +44,14 @@ public class Key {
 
     public void setKey_k(boolean key_k){
         this.key_k=key_k;
+    }
+
+    public boolean isKey_enter(){
+        return key_enter;
+    }
+
+    public void setKey_enter(boolean key_enter){
+        this.key_enter = key_enter;
     }
 
 }

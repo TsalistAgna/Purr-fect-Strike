@@ -1,16 +1,22 @@
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.FontMetrics;
 import java.awt.geom.Area;
-import java.awt.image.BaseMultiResolutionImage;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 
 public class GamePanel extends JComponent {
     private final int FPS = 60;
@@ -30,6 +36,7 @@ public class GamePanel extends JComponent {
     private Cat player = new Cat();
     private List<Mice> mice = new ArrayList<>();
     private List<Effect> effects;
+    private int score = 0;
 
     public void start() {
         width = getWidth();
@@ -92,6 +99,14 @@ public class GamePanel extends JComponent {
         }).start();
     }
 
+    private void resetGame(){
+        score = 0;
+        mice.clear();
+        lasers.clear();
+        player.changeLocation(150, 150);
+        player.reset();
+    }
+
     private void initKeyboard(){
         key = new Key();
         requestFocus();
@@ -113,6 +128,9 @@ public class GamePanel extends JComponent {
                 else if (e.getKeyCode()==KeyEvent.VK_K){
                     key.setKey_k(true);
                 }
+                else if (e.getKeyCode()==KeyEvent.VK_ENTER){
+                    key.setKey_enter(true);
+                }
             }
 
             @Override
@@ -132,6 +150,9 @@ public class GamePanel extends JComponent {
                 else if (e.getKeyCode()==KeyEvent.VK_K){
                     key.setKey_k(false);
                 }
+                else if (e.getKeyCode()==KeyEvent.VK_ENTER){
+                    key.setKey_enter(false);
+                }
             }
         });
         new Thread(new Runnable(){
@@ -139,39 +160,50 @@ public class GamePanel extends JComponent {
             public void run(){
                 float s =0.5f;
                 while (start){
-                    float angle = player.getAngle();
-                    if(key.isKiri()){
-                        angle -= s ;
-                    }
-                    if(key.isKanan()){
-                        angle += s ;
-                    }
-                    if (key.isKey_j() || key.isKey_k()) {
-                        if (shotTime == 0) {
-                            lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 5, 3f));
-                        } else {
-                            lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 10, 3f));
+                    if(player.isAlive()){
+                        float angle = player.getAngle();
+                        if(key.isKiri()){
+                            angle -= s ;
                         }
-                        shotTime++;
-                        if (shotTime == 5) {
+                        if(key.isKanan()){
+                            angle += s ;
+                        }
+                        if (key.isKey_j() || key.isKey_k()) {
+                            if (shotTime == 0) {
+                                lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                            } else {
+                                lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 10, 3f));
+                            }
+                            shotTime++;
+                            if (shotTime == 5) {
+                                shotTime = 0;
+                            }
+                        } else {
                             shotTime = 0;
                         }
-                    } else {
-                        shotTime = 0;
+                        if (key.isSpasi()) {
+                            player.speedUp();
+                        } else {
+                            player.speedDown();
+                        }
+                        player.update();
+                        player.changeAngle(angle);
+                    }else{
+                        if(key.isKey_enter()){
+                            resetGame();
+                        }
                     }
-                    if (key.isSpasi()) {
-                        player.speedUp();
-                    } else {
-                        player.speedDown();
-                    }
-                    player.update();
-                    player.changeAngle(angle);
+
                     for (int i = 0; i < mice.size(); i++) {
                         Mice mouse = mice.get(i);
                         if (mouse != null) {
                             mouse.update();
                             if (!mouse.check(width, height)) {
                                 mice.remove(mouse);
+                            }else{
+                                if(player.isAlive()){
+                                    checkCat(mouse);
+                                }
                             }
                         }
                     }
@@ -191,7 +223,8 @@ public class GamePanel extends JComponent {
                 area.intersect(mouse.getShape());
                 if (!area.isEmpty()) {
                     effects.add(new Effect(laser.getCenterX(), laser.getCenterY(), 3, 5, 60, 0.5f, new Color (230, 207, 105)));
-                    if (true ){
+                    if (!mouse.updateHP(laser.getSize())){
+                        score++;
                         mice.remove(mouse);
                         double x = mouse.getX() + Mice.MICE_SIZE/2;
                         double y = mouse.getY() + Mice.MICE_SIZE/2;
@@ -203,6 +236,36 @@ public class GamePanel extends JComponent {
                     }
                     
                     lasers.remove(laser);
+                }
+            }
+        }
+    }
+
+    private void checkCat(Mice mice) {
+        if (mice != null) {
+            Area area = new Area(player.getShape());
+            area.intersect(mice.getShape());
+            if (!area.isEmpty()) {
+                double miceHp = mice.getHP();
+                if (!mice.updateHP(player.getHP())){
+                    this.mice.remove(mice);
+                    double x = mice.getX() + Mice.MICE_SIZE/2;
+                    double y = mice.getY() + Mice.MICE_SIZE/2;
+                    effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color (32, 178, 169)));
+                    effects.add(new Effect(x, y, 5, 5, 75, 0.01f, new Color (32, 178, 169)));
+                    effects.add(new Effect(x, y, 10, 10, 100, 0.3f, new Color (230, 207, 105)));
+                    effects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color (255, 70, 70)));
+                    effects.add(new Effect(x, y, 10, 5, 100, 0.2f, new Color (255, 255, 255)));
+                }
+                if (!player.updateHP(miceHp)){
+                    player.setAlive(false);
+                    double x = player.getX() + Cat.CAT_SIZE/2;
+                    double y = player.getY() + Cat.CAT_SIZE/2;
+                    effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color (32, 178, 169)));
+                    effects.add(new Effect(x, y, 5, 5, 75, 0.01f, new Color (32, 178, 169)));
+                    effects.add(new Effect(x, y, 10, 10, 100, 0.3f, new Color (230, 207, 105)));
+                    effects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color (255, 70, 70)));
+                    effects.add(new Effect(x, y, 10, 5, 100, 0.2f, new Color (255, 255, 255)));
                 }
             }
         }
@@ -264,6 +327,9 @@ public class GamePanel extends JComponent {
     }
 
     private void drawGame() {
+        if(player.isAlive()){
+            player.draw(g2);
+        }
         if (player != null) {
             player.draw(g2);
             for(int i = 0; i < lasers.size(); i++){
@@ -285,8 +351,34 @@ public class GamePanel extends JComponent {
                 eff.draw(g2);
             }
         }
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(getFont().deriveFont(Font.BOLD, 15f));
+        g2.drawString("Score: " + score, 10, 20);
+
+        if(!player.isAlive()){
+            String text = "GAME OVER";
+            String text2 = "Tekan enter untuk mulai lagi";
+            g2.setFont(new Font("Arial", Font.BOLD, 50));
+            FontMetrics fm = g2.getFontMetrics();
+            Rectangle2D r2 = fm.getStringBounds(text, g2);
+
+            double textWidth = r2.getWidth();
+            double textHeight = r2.getHeight();
+            double x = (width - textWidth) / 2;
+            double y = (height - textHeight) / 2;
+
+            g2.drawString(text, (int) x, (int) y + fm.getAscent());
+            g2.setFont(getFont().deriveFont(Font.BOLD, 20));
+            fm = g2.getFontMetrics();
+            r2 = fm.getStringBounds(text2, g2);
+            textWidth = r2.getWidth();
+            textHeight = r2.getHeight();
+            x = (width - textWidth) / 2;
+            y = (height - textHeight) / 2;
+            g2.drawString(text2, (int) x, (int) y + fm.getAscent() + 50);
+        }
     }
-    
     
 
     private void render() {

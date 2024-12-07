@@ -1,13 +1,13 @@
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import javax.swing.ImageIcon;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
-import java.awt.Shape;
-import java.awt.Rectangle;
+import javax.swing.ImageIcon;
 
-public class Mice {
+public class Mice extends HpRender{
     public static final double MICE_SIZE = 50;
     private double x;
     private double y;
@@ -17,6 +17,8 @@ public class Mice {
     private final Area miceShape;
 
     public Mice() {
+        super(new HP(20, 20));
+
         try {
             image = new ImageIcon("Assets\\Images\\Tikus\\tikus1.png")  
                         .getImage()
@@ -61,6 +63,7 @@ public class Mice {
         tran.rotate(Math.toRadians(angle + 45), MICE_SIZE / 2, MICE_SIZE / 2);
         g2.drawImage(image, tran, null);
         Shape shap = getShape();
+        hpRender(g2, shap, y);
         g2.setTransform(oldTransform);
     }
 

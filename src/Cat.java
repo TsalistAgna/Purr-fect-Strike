@@ -1,12 +1,16 @@
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Path2D;
 import javax.swing.ImageIcon;
 
-public class Cat{
+public class Cat extends HpRender{
 
     public Cat() {
+        super(new HP(50, 50));
         try {
             images = new ImageIcon("Assets\\Images\\Kucing\\1.png")
                         .getImage()
@@ -15,6 +19,13 @@ public class Cat{
             e.printStackTrace();
             System.out.println("Gagal memuat gambar kucing.");
         }
+        Path2D p = new Path2D.Double();
+        p.moveTo(0, 15);
+        p.lineTo(20, 5);
+        p.lineTo(CAT_SIZE + 15, CAT_SIZE / 2);
+        p.lineTo(20, CAT_SIZE - 5);
+        p.lineTo(0, CAT_SIZE - 15);
+        catShape = new Area(p);
     }
 
 
@@ -23,9 +34,11 @@ public class Cat{
     private float MAX_SPEED = 1f;
     private float speed = 0f;
     private float angle=0f;
+    private Area catShape;
     private Image images;
     private Image image_speed;
     private boolean speedUp;
+    private boolean alive = true;
 
     public void changeLocation(double x, double y){
         this.x=x;
@@ -55,7 +68,19 @@ public class Cat{
 
         tran.rotate(Math.toRadians(angle+45), CAT_SIZE/2, CAT_SIZE/2);
         g2.drawImage(speedUp? image_speed : this.images, 0, 0, null);
+        hpRender(g2, getShape(), y);
         g2.setTransform(oldTransform);
+
+        g2.setColor(new Color(12, 173, 64));
+        g2.draw(getShape());
+        g2.draw(getShape().getBounds());
+    }
+
+    public Area getShape() {
+        AffineTransform afx = new AffineTransform();
+        afx.translate(x, y);
+        afx.rotate(Math.toRadians(angle), CAT_SIZE / 2, CAT_SIZE / 2);
+        return new Area(afx.createTransformedShape(catShape));
     }
 
     public double getX() {
@@ -86,5 +111,20 @@ public class Cat{
         } else {
             speed -= 0.004f;
         }
+    }
+
+    public boolean isAlive(){
+        return alive;
+    }
+
+    public void setAlive(boolean alive){
+        this.alive=alive;
+    }
+
+    public void reset(){
+        alive=true;
+        speed=0;
+        resetHP();
+        angle=0;
     }
 }
