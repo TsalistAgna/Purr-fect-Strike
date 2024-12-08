@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -34,7 +35,7 @@ public class GamePanel extends JComponent {
 
     private List<Laser> lasers = new ArrayList<>();
     private Cat player = new Cat();
-    private List<Mice> mice = new ArrayList<>();
+    private List<Mice> mice = Collections.synchronizedList(new ArrayList<>());
     private List<Effect> effects;
     private int score = 0;
 
@@ -72,7 +73,7 @@ public class GamePanel extends JComponent {
     
     private void addMice(){
         Random ran = new Random();
-        int locationY = ran.nextInt(height - 50) + 25;
+        int locationY = ran.nextInt(Math.max(height - 50, 1)) + 25;
         Mice mouse1 = new Mice();
         mouse1.changeLocation(0, locationY);
         mouse1.changeAngle(0);
@@ -283,9 +284,10 @@ public class GamePanel extends JComponent {
                             checkLaser(laser);
                             if(!laser.check(width, height)){
                                 lasers.remove(laser);
-                            } else {
-                                lasers.remove(laser);
                             }
+                            // else {
+                            //     lasers.remove(laser);
+                            // }
                         }
                     }
                     for (int i = 0; i < effects.size(); i++){
@@ -294,7 +296,8 @@ public class GamePanel extends JComponent {
                             eff.update();
                             if (!eff.check()){
                                 effects.remove(eff);
-                            }else{
+                            }
+                            else{
                                 effects.remove(eff);
                             }
                         }
@@ -384,7 +387,7 @@ public class GamePanel extends JComponent {
     private void render() {
         Graphics g = getGraphics();
         if (g != null) {
-            g.drawImage(image, 0, 0, null); 
+            g.drawImage(image, 0, 0, null);
             g.dispose();
         }
     }
@@ -402,15 +405,59 @@ public class GamePanel extends JComponent {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        // Gambar latar belakang
-        if (backgroundImage != null) {
-            g2.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+        drawBackground(g2);
+        drawGame(g2);
+        if (!player.isAlive()) {
+            drawGameOver(g2);  // Menambahkan tampilan Game Over setelah objek digambar
         }
+    }
 
-        // Gambar objek kucing
-        if (player != null) {
+    private void drawGame(Graphics2D g2) {
+        // Gambar kucing, tikus, laser, dan efek
+        if (player.isAlive()) {
             player.draw(g2);
         }
+        for (Laser laser : lasers) {
+            laser.draw(g2);
+        }
+        for (Mice mouse : mice) {
+            mouse.draw(g2);
+        }
+        for (Effect eff : effects) {
+            eff.draw(g2);
+        }
+    }
+
+    private void drawBackground(Graphics2D g2) {
+        if (backgroundImage != null) {
+            g2.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), null);
+        } else {
+            g2.setColor(new Color(30, 30, 30));
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
+
+    private void drawGameOver(Graphics2D g2) {
+        String text = "GAME OVER";
+        String text2 = "Tekan enter untuk mulai lagi";
+        g2.setFont(new Font("Arial", Font.BOLD, 50));
+        FontMetrics fm = g2.getFontMetrics();
+        Rectangle2D r2 = fm.getStringBounds(text, g2);
+    
+        double textWidth = r2.getWidth();
+        double textHeight = r2.getHeight();
+        double x = (getWidth() - textWidth) / 2;
+        double y = (getHeight() - textHeight) / 2;
+    
+        g2.drawString(text, (int) x, (int) y + fm.getAscent());
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        fm = g2.getFontMetrics();
+        r2 = fm.getStringBounds(text2, g2);
+        textWidth = r2.getWidth();
+        textHeight = r2.getHeight();
+        x = (getWidth() - textWidth) / 2;
+        y = (getHeight() - textHeight) / 2;
+        g2.drawString(text2, (int) x, (int) y + fm.getAscent() + 50);
     }
 
 }
