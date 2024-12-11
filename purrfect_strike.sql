@@ -134,6 +134,32 @@ ALTER TABLE `tikus_image`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
+CREATE TABLE `players` (
+  `id` int(5) NOT NULL,
+  `nama` varchar(100) NOT NULL,
+  `score` int(100) NOT NULL
+)
+
+INSERT INTO `players` (`id`, `nama`, `score`) VALUES
+(2, 'nana', 0),
+(3, 'dinda', 95),
+(4, 'Dara', 32),
+(5, 'Dara', 32),
+(6, 'Dara', 32),
+(7, 'Dira', 29),
+(8, 'Lena', 32),
+(9, 'Dira', 22),
+(10, 'Ayu', 0),
+(11, 'Aryan', 31),
+(12, 'Dinda', 16),
+(13, 'Sari', 0),
+(14, 'Dika', 0),
+(15, 'Nana', 0),
+(16, 'Nana', 0),
+(17, 'ayu', 25),
+(18, 'Ayu', 0),
+(19, 'Dinda', 0);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
