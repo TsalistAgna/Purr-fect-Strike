@@ -48,6 +48,39 @@ public class GamePanel extends JComponent {
     private List<Effect> effects;
     private int score = 0;
 
+    private JTextField nameField;
+    private JButton saveButton;
+    private boolean gameOver;
+
+    int fieldWidth = 200; // Lebar text field
+    int fieldHeight = 30; // Tinggi text field
+    int buttonWidth = 80; // Lebar tombol
+    int buttonHeight = 30; // Tinggi tombol
+
+    public GamePanel() {
+        setLayout(null); // Allows absolute positioning for text field and button
+
+        // Initialize text field for player name input
+        nameField = new JTextField();
+        nameField.setBounds(150, 300, 200, 30); // Positioning text field
+        nameField.setVisible(false);
+        add(nameField);
+
+        nameField.addActionListener(e -> saveScore());
+
+
+        // Initialize save button
+        // saveButton = new JButton("Save");
+        // saveButton.setBounds(370, 300, 100, 30); // Positioning save button
+        // saveButton.setVisible(false);
+        // saveButton.addActionListener(e -> saveScore());
+        // add(saveButton);
+    }
+
+    private boolean isLaserEnlarged = false; 
+    private long laserEnlargeStartTime = 0;
+    private final long laserEnlargeDuration = 1500; 
+
     public void start() {
         width = getWidth();
         height = getHeight();
@@ -399,9 +432,15 @@ public class GamePanel extends JComponent {
         g2.drawString("Score: " + score, 10, 25);
 
         if(!player.isAlive()){
+
+            // String text = "GAME OVER";
+            // String text2 = "Tekan enter untuk mulai lagi";
+            // g2.setFont(new Font("Arial", Font.BOLD, 50));
+            // FontMetrics fm = g2.getFontMetrics();
+            // Rectangle2D r2 = fm.getStringBounds(text, g2);
             String text = "GAME OVER";
             String text2 = "Tekan enter untuk mulai lagi";
-            g2.setFont(new Font("Arial", Font.BOLD, 50));
+            g2.setFont(new Font("Poppins", Font.BOLD, 50));
             FontMetrics fm = g2.getFontMetrics();
             Rectangle2D r2 = fm.getStringBounds(text, g2);
 
@@ -549,8 +588,10 @@ public class GamePanel extends JComponent {
 
     private void drawGameOver(Graphics2D g2) {
         String text = "GAME OVER";
-        String text2 = "Tekan enter untuk mulai lagi";
+
+        String text2 = "Masukkan nama anda!!";
         g2.setFont(new Font("Arial", Font.BOLD, 50));
+
         FontMetrics fm = g2.getFontMetrics();
         Rectangle2D r2 = fm.getStringBounds(text, g2);
 
