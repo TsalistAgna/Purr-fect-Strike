@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 03, 2024 at 09:46 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Dec 11, 2024 at 05:18 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -44,6 +44,42 @@ INSERT INTO `kucing_image` (`id`, `nama`, `path_image`) VALUES
 (4, 'Gerald', 'Assets\\Images\\Kucing\\4.png'),
 (5, 'Sky', 'Assets\\Images\\Kucing\\5.png'),
 (6, 'Nonem', 'Assets\\Images\\Kucing\\6.png');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `players`
+--
+
+CREATE TABLE `players` (
+  `id` int(5) NOT NULL,
+  `nama` varchar(100) NOT NULL,
+  `score` int(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `players`
+--
+
+INSERT INTO `players` (`id`, `nama`, `score`) VALUES
+(2, 'nana', 0),
+(3, 'dinda', 95),
+(4, 'Dara', 32),
+(5, 'Dara', 32),
+(6, 'Dara', 32),
+(7, 'Dira', 29),
+(8, 'Lena', 32),
+(9, 'Dira', 22),
+(10, 'Ayu', 0),
+(11, 'Aryan', 31),
+(12, 'Dinda', 16),
+(13, 'Sari', 0),
+(14, 'Dika', 0),
+(15, 'Nana', 0),
+(16, 'Nana', 0),
+(17, 'ayu', 25),
+(18, 'Ayu', 0),
+(19, 'Dinda', 0);
 
 -- --------------------------------------------------------
 
@@ -100,6 +136,12 @@ ALTER TABLE `kucing_image`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `players`
+--
+ALTER TABLE `players`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `sound`
 --
 ALTER TABLE `sound`
@@ -120,6 +162,12 @@ ALTER TABLE `tikus_image`
 --
 ALTER TABLE `kucing_image`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `players`
+--
+ALTER TABLE `players`
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `sound`
