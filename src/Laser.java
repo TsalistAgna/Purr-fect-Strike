@@ -12,10 +12,10 @@ public class Laser {
     private Color color = new Color(255, 0, 0);
     private float angle;
     private double size;
-    private double defaultSize;  // Menyimpan ukuran default
+    private double defaultSize;  
     private float speed = 1f;
 
-    private boolean isEnlarged = false; // Flag untuk pembesaran laser
+    private boolean isEnlarged = false; 
 
     public Laser(double x, double y, float angle, double size, float speed) {
         x += Cat.CAT_SIZE / 2 - (size / 2);
@@ -25,7 +25,7 @@ public class Laser {
         this.y = y;
         this.angle = angle;
         this.size = size;
-        this.defaultSize = size;  // Menyimpan ukuran default
+        this.defaultSize = size;  
         this.speed = speed;
         shape = new Ellipse2D.Double(0, 0, size, size);
     }
@@ -34,14 +34,12 @@ public class Laser {
         x += Math.cos(Math.toRadians(angle)) * speed;
         y += Math.sin(Math.toRadians(angle)) * speed;
     
-        // Jika pembesaran aktif, ubah ukuran laser
         if (isEnlarged) {
-            size = defaultSize * 1.5; // Pembesaran laser 50%
+            size = defaultSize * 2; 
         } else {
-            size = defaultSize; // Kembali ke ukuran default
+            size = defaultSize; 
         }
-    
-        // Perbarui bentuk laser setelah ukuran berubah
+
         shape = new Ellipse2D.Double(0, 0, size, size);
     }
     
@@ -86,7 +84,6 @@ public class Laser {
         return y + size / 2;
     }
 
-    // Menetapkan apakah laser sedang diperbesar atau tidak
     public void setLaserEnlarged(boolean isEnlarged) {
         this.isEnlarged = isEnlarged;
     }

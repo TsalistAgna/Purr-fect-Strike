@@ -41,9 +41,9 @@ public class GamePanel extends JComponent {
     private List<Effect> effects;
     private int score = 0;
 
-    private boolean isLaserEnlarged = false;  // Flag untuk menandakan apakah laser sedang diperbesar
-    private long laserEnlargeStartTime = 0;   // Waktu mulai pembesaran laser
-    private final long laserEnlargeDuration = 2000; // Durasi pembesaran laser dalam milidetik (1 detik)
+    private boolean isLaserEnlarged = false; 
+    private long laserEnlargeStartTime = 0;   
+    private final long laserEnlargeDuration = 1500; 
 
 
     public void start() {
@@ -264,16 +264,15 @@ public class GamePanel extends JComponent {
     }
 
     private void checkLaser(Laser laser) {
-        // Memeriksa apakah skor adalah kelipatan 10 dan belum ada efek pembesaran laser yang aktif
-        if (score % 10 == 0 && !isLaserEnlarged) {
+        if (score > 0 && score % 10 == 0 && !isLaserEnlarged) {
             isLaserEnlarged = true;
-            laserEnlargeStartTime = System.currentTimeMillis(); // Mulai timer untuk pembesaran laser
+            laserEnlargeStartTime = System.currentTimeMillis(); 
         }
     
         for (int i = 0; i < mice.size(); i++) {
             Mice mouse = mice.get(i);
             if (mouse != null) {
-                Area area = new Area(laser.getShape());  // Menggunakan bentuk laser yang terupdate
+                Area area = new Area(laser.getShape());  
                 area.intersect(mouse.getShape());
                 if (!area.isEmpty()) {
                     effects.add(new Effect(laser.getCenterX(), laser.getCenterY(), 3, 5, 60, 0.5f, new Color(230, 207, 105)));
@@ -295,16 +294,15 @@ public class GamePanel extends JComponent {
             }
         }
     
-        // Jika pembesaran laser aktif, cek waktu pembesarannya
         if (isLaserEnlarged) {
             long elapsedTime = System.currentTimeMillis() - laserEnlargeStartTime;
             if (elapsedTime > laserEnlargeDuration) {
-                isLaserEnlarged = false;  // Matikan pembesaran setelah 1 detik
+                isLaserEnlarged = false;  
             } else {
-                laser.setLaserEnlarged(true);  // Perbesar laser selama durasi
+                laser.setLaserEnlarged(true);  
             }
         } else {
-            laser.setLaserEnlarged(false);  // Pastikan pembesaran dimatikan jika tidak aktif
+            laser.setLaserEnlarged(false);  
         }
     }
     
