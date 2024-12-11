@@ -7,7 +7,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import javax.swing.ImageIcon;
 
-public class Mice extends HpRender{
+public class Mice extends HpRender {
     public static final double MICE_SIZE = 50;
     private double x;
     private double y;
@@ -20,13 +20,14 @@ public class Mice extends HpRender{
         super(new HP(20, 20));
 
         try {
-            image = new ImageIcon("Assets\\Images\\Tikus\\tikus1.png")  
-                        .getImage()
-                        .getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            image = new ImageIcon("Assets\\Images\\Tikus\\tikus1.png")
+                    .getImage()
+                    .getScaledInstance(80, 80, Image.SCALE_SMOOTH);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Gagal memuat gambar tikus.");
         }
+
         Path2D p = new Path2D.Double();
         p.moveTo(0, MICE_SIZE / 2);
         p.lineTo(15, 10);
@@ -59,11 +60,17 @@ public class Mice extends HpRender{
     public void draw(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
         g2.translate(x, y);
+
         AffineTransform tran = new AffineTransform();
-        tran.rotate(Math.toRadians(angle + 45), MICE_SIZE / 2, MICE_SIZE / 2);
+        if (angle == 180) {
+            tran.scale(-1, 1); 
+            tran.translate(-MICE_SIZE, 0); 
+        }
         g2.drawImage(image, tran, null);
+
         Shape shap = getShape();
         hpRender(g2, shap, y);
+
         g2.setTransform(oldTransform);
     }
 
@@ -88,10 +95,6 @@ public class Mice extends HpRender{
 
     public boolean check(int width, int height) {
         Rectangle size = getShape().getBounds();
-        if (x <= -size.getWidth() || y < -size.getHeight() || x > width || y > height) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(x <= -size.getWidth() || y < -size.getHeight() || x > width || y > height);
     }
 }

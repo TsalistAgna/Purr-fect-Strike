@@ -8,13 +8,23 @@ import java.awt.geom.Path2D;
 import javax.swing.ImageIcon;
 
 public class Cat extends HpRender{
-
+    public static final double CAT_SIZE=64;
+    public double x, y;
+    private float MAX_SPEED = 1f;
+    private float speed = 0f;
+    private float angle=0f;
+    private Area catShape;
+    private Image images;
+    private Image image_speed;
+    private boolean speedUp;
+    private boolean alive = true;
+    
     public Cat() {
         super(new HP(100, 100));
         try {
             images = new ImageIcon("Assets\\Images\\Kucing\\1.png")
                         .getImage()
-                        .getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                        .getScaledInstance(120, 120, Image.SCALE_SMOOTH);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Gagal memuat gambar kucing.");
@@ -27,18 +37,6 @@ public class Cat extends HpRender{
         p.lineTo(0, CAT_SIZE - 15);
         catShape = new Area(p);
     }
-
-
-    public static final double CAT_SIZE=64;
-    public double x, y;
-    private float MAX_SPEED = 1f;
-    private float speed = 0f;
-    private float angle=0f;
-    private Area catShape;
-    private Image images;
-    private Image image_speed;
-    private boolean speedUp;
-    private boolean alive = true;
 
     public void changeLocation(double x, double y){
         this.x=x;
