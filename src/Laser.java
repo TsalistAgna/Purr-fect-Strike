@@ -5,7 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
-public class Laser {
+public class Laser implements Object {
     private double x;
     private double y;
     private Shape shape;

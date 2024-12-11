@@ -1,8 +1,8 @@
-public class HP {
+public class HealthPoint {
     private double MAX_HP;
     private double currentHp;
 
-    public HP(double MAX_HP, double currentHp){
+    public HealthPoint(double MAX_HP, double currentHp){
         this.MAX_HP = MAX_HP;
         this.currentHp = currentHp;
     }
@@ -23,6 +23,6 @@ public class HP {
         this.currentHp = currentHp;
     }
 
-    public HP(){
+    public HealthPoint(){
     }
 }

@@ -7,7 +7,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import javax.swing.ImageIcon;
 
-public class Cat extends HpRender{
+public class Cat extends HpRenderImpl implements Object{
     public static final double CAT_SIZE=64;
     public double x, y;
     private float MAX_SPEED = 1f;
@@ -20,7 +20,7 @@ public class Cat extends HpRender{
     private boolean alive = true;
     
     public Cat() {
-        super(new HP (100, 100));
+        super(new HealthPoint (100, 100));
         try {
             images = new ImageIcon("Assets\\Images\\Kucing\\1.png")
                         .getImage()

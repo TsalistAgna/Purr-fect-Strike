@@ -7,7 +7,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import javax.swing.ImageIcon;
 
-public class Mice extends HpRender {
+public class Mice extends HpRenderImpl implements Object {
     public static final double MICE_SIZE = 50;
     private double x;
     private double y;
@@ -17,7 +17,7 @@ public class Mice extends HpRender {
     private final Area miceShape;
 
     public Mice() {
-        super(new HP (20, 20));
+        super(new HealthPoint (20, 20));
 
         try {
             image = new ImageIcon("Assets\\Images\\Tikus\\tikus1.png")

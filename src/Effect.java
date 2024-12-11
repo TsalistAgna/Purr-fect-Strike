@@ -7,7 +7,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
-public class Effect {
+public class Effect implements Object{
     private final double x;
     private final double y;
     private final double jarakMaks;
