@@ -56,7 +56,6 @@ public class GamePanel extends JComponent {
                 long startTime = System.nanoTime();
                 drawBackground();
                 drawGame();
-                // paintComponents(g2);
                 render();
                 long time = System.nanoTime() - startTime;
     
@@ -72,23 +71,26 @@ public class GamePanel extends JComponent {
         thread.start();
     }
     
-    private void addMice(){
+    private void addMice() {
         Random ran = new Random();
         int locationY = ran.nextInt(Math.max(height - 50, 1)) + 25;
+
         Mice mouse1 = new Mice();
         mouse1.changeLocation(0, locationY);
-        mouse1.changeAngle(0);
+        mouse1.changeAngle(0); 
         mice.add(mouse1);
-        int locationY2 = ran.nextInt(height - 50) + 25;
+
+        int locationY2 = ran.nextInt(Math.max(height - 50, 1)) + 25;
+
         Mice mouse2 = new Mice();
         mouse2.changeLocation(width, locationY2);
-        mouse2.changeAngle(180);
+        mouse2.changeAngle(180); 
         mice.add(mouse2);
     }
 
     private void initObjectGame() {
         sound = new Sound();
-        player.changeLocation(150, 150);
+        player.changeLocation(650, 300);
         System.out.println("Lokasi kucing: " + player.getX() + ", " + player.getY());
         effects = new ArrayList<>();
         new Thread(new Runnable() {
@@ -106,7 +108,7 @@ public class GamePanel extends JComponent {
         score = 0;
         mice.clear();
         lasers.clear();
-        player.changeLocation(150, 150);
+        player.changeLocation(650, 300);
         player.reset();
     }
 
@@ -190,6 +192,16 @@ public class GamePanel extends JComponent {
                             player.speedDown();
                         }
                         player.update();
+                        if (player.getX() < 0) {
+                            player.changeLocation(0, player.getY());
+                        } else if (player.getX() + Cat.CAT_SIZE > width) {
+                            player.changeLocation(width - Cat.CAT_SIZE, player.getY());
+                        }
+                        if (player.getY() < 0) {
+                            player.changeLocation(player.getX(), 0);
+                        } else if (player.getY() + Cat.CAT_SIZE > height) {
+                            player.changeLocation(player.getX(), height - Cat.CAT_SIZE);
+                        }
                         player.changeAngle(angle);
                     }else{
                         if(key.isKey_enter()){
@@ -282,31 +294,30 @@ public class GamePanel extends JComponent {
             @Override
             public void run(){
                 while (start) {
-                    for (int i=0; i < lasers.size(); i++) {
+                    List<Laser> toRemove = new ArrayList<>();
+                    // Iterasi melalui lasers
+                    for (int i = 0; i < lasers.size(); i++) {
                         Laser laser = lasers.get(i);
                         if (laser != null) {
                             laser.update();
                             checkLaser(laser);
-                            if(!laser.check(width, height)){
-                                lasers.remove(laser);
+                            // Menandai laser untuk dihapus jika keluar dari layar
+                            if (!laser.check(width, height)) {
+                                toRemove.add(laser);
                             }
-                            // else {
-                            //     lasers.remove(laser);
-                            // }
                         }
                     }
-                    for (int i = 0; i < effects.size(); i++){
+                    // Menghapus laser yang telah ditandai
+                    lasers.removeAll(toRemove);
+                    // Lanjutkan dengan efek dan lainnya
+                    for (int i = 0; i < effects.size(); i++) {
                         Effect eff = effects.get(i);
-                        if (eff != null){
+                        if (eff != null) {
                             eff.update();
-                            if (!eff.check()){
-                                effects.remove(eff);
-                            }
-                            else{
-                                effects.remove(eff);
+                            if (!eff.check()) {
+                                effects.remove(eff);  // Hapus efek jika tidak aktif
                             }
                         }
-                        
                     }
                     sleep(1);
                 }
@@ -409,7 +420,7 @@ public class GamePanel extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-
+        g2.drawImage(image, 0, 0, null);
         drawBackground(g2);
         drawGame(g2);
         if (!player.isAlive()) {
