@@ -33,6 +33,7 @@ public class GamePanel extends JComponent {
     private Key key;
     private int shotTime;
 
+    private Sound sound;
     private List<Laser> lasers = new ArrayList<>();
     private Cat player = new Cat();
     private List<Mice> mice = Collections.synchronizedList(new ArrayList<>());
@@ -86,6 +87,7 @@ public class GamePanel extends JComponent {
     }
 
     private void initObjectGame() {
+        sound = new Sound();
         player.changeLocation(150, 150);
         System.out.println("Lokasi kucing: " + player.getX() + ", " + player.getY());
         effects = new ArrayList<>();
@@ -227,6 +229,7 @@ public class GamePanel extends JComponent {
                     if (!mouse.updateHP(laser.getSize())){
                         score++;
                         mice.remove(mouse);
+                        sound.soundShoot();
                         double x = mouse.getX() + Mice.MICE_SIZE/2;
                         double y = mouse.getY() + Mice.MICE_SIZE/2;
                         effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color (32, 178, 169)));
@@ -250,6 +253,7 @@ public class GamePanel extends JComponent {
                 double miceHp = mice.getHP();
                 if (!mice.updateHP(player.getHP())){
                     this.mice.remove(mice);
+                    sound.soundHit();
                     double x = mice.getX() + Mice.MICE_SIZE/2;
                     double y = mice.getY() + Mice.MICE_SIZE/2;
                     effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color (32, 178, 169)));
@@ -260,6 +264,7 @@ public class GamePanel extends JComponent {
                 }
                 if (!player.updateHP(miceHp)){
                     player.setAlive(false);
+                    sound.soundDead();
                     double x = player.getX() + Cat.CAT_SIZE/2;
                     double y = player.getY() + Cat.CAT_SIZE/2;
                     effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color (32, 178, 169)));
