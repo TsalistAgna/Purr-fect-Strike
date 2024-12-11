@@ -17,7 +17,7 @@ public class Mice extends HpRender {
     private final Area miceShape;
 
     public Mice() {
-        super(new HP(20, 20));
+        super(new HP (20, 20));
 
         try {
             image = new ImageIcon("Assets\\Images\\Tikus\\tikus1.png")

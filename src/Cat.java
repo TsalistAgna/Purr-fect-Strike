@@ -20,7 +20,7 @@ public class Cat extends HpRender{
     private boolean alive = true;
     
     public Cat() {
-        super(new HP(100, 100));
+        super(new HP (100, 100));
         try {
             images = new ImageIcon("Assets\\Images\\Kucing\\1.png")
                         .getImage()
