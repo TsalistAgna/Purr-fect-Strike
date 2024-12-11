@@ -28,6 +28,7 @@ public class GamePanel extends JComponent {
     private boolean start = true;
 
     private BufferedImage image;
+    private BufferedImage bufferImage;
     private Graphics2D g2;
     private BufferedImage backgroundImage;
     private Key key;
@@ -39,6 +40,11 @@ public class GamePanel extends JComponent {
     private List<Mice> mice = Collections.synchronizedList(new ArrayList<>());
     private List<Effect> effects;
     private int score = 0;
+
+    private boolean isLaserEnlarged = false;  // Flag untuk menandakan apakah laser sedang diperbesar
+    private long laserEnlargeStartTime = 0;   // Waktu mulai pembesaran laser
+    private final long laserEnlargeDuration = 2000; // Durasi pembesaran laser dalam milidetik (1 detik)
+
 
     public void start() {
         width = getWidth();
@@ -130,9 +136,6 @@ public class GamePanel extends JComponent {
                 else if (e.getKeyCode()==KeyEvent.VK_J){
                     key.setKey_j(true);
                 }
-                else if (e.getKeyCode()==KeyEvent.VK_K){
-                    key.setKey_k(true);
-                }
                 else if (e.getKeyCode()==KeyEvent.VK_ENTER){
                     key.setKey_enter(true);
                 }
@@ -152,9 +155,6 @@ public class GamePanel extends JComponent {
                 else if (e.getKeyCode()==KeyEvent.VK_J){
                     key.setKey_j(false);
                 }
-                else if (e.getKeyCode()==KeyEvent.VK_K){
-                    key.setKey_k(false);
-                }
                 else if (e.getKeyCode()==KeyEvent.VK_ENTER){
                     key.setKey_enter(false);
                 }
@@ -173,7 +173,7 @@ public class GamePanel extends JComponent {
                         if(key.isKanan()){
                             angle += s ;
                         }
-                        if (key.isKey_j() || key.isKey_k()) {
+                        if (key.isKey_j()) {
                             if (shotTime == 0) {
                                 lasers.add(0, new Laser(player.getX(), player.getY(), player.getAngle(), 5, 3f));
                             } else {
@@ -230,32 +230,6 @@ public class GamePanel extends JComponent {
         }).start();
     }
 
-    private void checkLaser(Laser laser) {
-        for (int i = 0; i < mice.size(); i++) {
-            Mice mouse = mice.get(i);
-            if (mouse != null) {
-                Area area = new Area(laser.getShape());
-                area.intersect(mouse.getShape());
-                if (!area.isEmpty()) {
-                    effects.add(new Effect(laser.getCenterX(), laser.getCenterY(), 3, 5, 60, 0.5f, new Color (230, 207, 105)));
-                    if (!mouse.updateHP(laser.getSize())){
-                        score++;
-                        mice.remove(mouse);
-                        sound.soundShoot();
-                        double x = mouse.getX() + Mice.MICE_SIZE/2;
-                        double y = mouse.getY() + Mice.MICE_SIZE/2;
-                        effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color (32, 178, 169)));
-                        effects.add(new Effect(x, y, 5, 5, 75, 0.01f, new Color (32, 178, 169)));
-                        effects.add(new Effect(x, y, 10, 10, 100, 0.3f, new Color (230, 207, 105)));
-                        effects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color (255, 70, 70)));
-                        effects.add(new Effect(x, y, 10, 5, 100, 0.2f, new Color (255, 255, 255)));
-                    }
-                    
-                    lasers.remove(laser);
-                }
-            }
-        }
-    }
 
     private void checkCat(Mice mice) {
         if (mice != null) {
@@ -289,33 +263,76 @@ public class GamePanel extends JComponent {
         }
     }
 
+    private void checkLaser(Laser laser) {
+        // Memeriksa apakah skor adalah kelipatan 10 dan belum ada efek pembesaran laser yang aktif
+        if (score % 10 == 0 && !isLaserEnlarged) {
+            isLaserEnlarged = true;
+            laserEnlargeStartTime = System.currentTimeMillis(); // Mulai timer untuk pembesaran laser
+        }
+    
+        for (int i = 0; i < mice.size(); i++) {
+            Mice mouse = mice.get(i);
+            if (mouse != null) {
+                Area area = new Area(laser.getShape());  // Menggunakan bentuk laser yang terupdate
+                area.intersect(mouse.getShape());
+                if (!area.isEmpty()) {
+                    effects.add(new Effect(laser.getCenterX(), laser.getCenterY(), 3, 5, 60, 0.5f, new Color(230, 207, 105)));
+                    if (!mouse.updateHP(laser.getSize())) {
+                        score++;
+                        mice.remove(mouse);
+                        sound.soundShoot();
+                        double x = mouse.getX() + Mice.MICE_SIZE / 2;
+                        double y = mouse.getY() + Mice.MICE_SIZE / 2;
+                        effects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                        effects.add(new Effect(x, y, 5, 5, 75, 0.01f, new Color(32, 178, 169)));
+                        effects.add(new Effect(x, y, 10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                        effects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                        effects.add(new Effect(x, y, 10, 5, 100, 0.2f, new Color(255, 255, 255)));
+                    }
+    
+                    lasers.remove(laser);
+                }
+            }
+        }
+    
+        // Jika pembesaran laser aktif, cek waktu pembesarannya
+        if (isLaserEnlarged) {
+            long elapsedTime = System.currentTimeMillis() - laserEnlargeStartTime;
+            if (elapsedTime > laserEnlargeDuration) {
+                isLaserEnlarged = false;  // Matikan pembesaran setelah 1 detik
+            } else {
+                laser.setLaserEnlarged(true);  // Perbesar laser selama durasi
+            }
+        } else {
+            laser.setLaserEnlarged(false);  // Pastikan pembesaran dimatikan jika tidak aktif
+        }
+    }
+    
+    
+    
     private void initLasers(){
         new Thread(new Runnable()  {
             @Override
             public void run(){
                 while (start) {
                     List<Laser> toRemove = new ArrayList<>();
-                    // Iterasi melalui lasers
                     for (int i = 0; i < lasers.size(); i++) {
                         Laser laser = lasers.get(i);
                         if (laser != null) {
                             laser.update();
                             checkLaser(laser);
-                            // Menandai laser untuk dihapus jika keluar dari layar
                             if (!laser.check(width, height)) {
                                 toRemove.add(laser);
                             }
                         }
                     }
-                    // Menghapus laser yang telah ditandai
                     lasers.removeAll(toRemove);
-                    // Lanjutkan dengan efek dan lainnya
                     for (int i = 0; i < effects.size(); i++) {
                         Effect eff = effects.get(i);
                         if (eff != null) {
                             eff.update();
                             if (!eff.check()) {
-                                effects.remove(eff);  // Hapus efek jika tidak aktif
+                                effects.remove(eff);  
                             }
                         }
                     }
@@ -372,13 +389,13 @@ public class GamePanel extends JComponent {
         }
 
         g2.setColor(Color.BLACK);
-        g2.setFont(getFont().deriveFont(Font.BOLD, 15f));
-        g2.drawString("Score: " + score, 10, 20);
+        g2.setFont((new Font("Poppins", Font.BOLD, 20)));
+        g2.drawString("Score: " + score, 10, 25);
 
         if(!player.isAlive()){
             String text = "GAME OVER";
             String text2 = "Tekan enter untuk mulai lagi";
-            g2.setFont(new Font("Arial", Font.BOLD, 50));
+            g2.setFont(new Font("Poppins", Font.BOLD, 50));
             FontMetrics fm = g2.getFontMetrics();
             Rectangle2D r2 = fm.getStringBounds(text, g2);
 
@@ -419,30 +436,53 @@ public class GamePanel extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.drawImage(image, 0, 0, null);
-        drawBackground(g2);
-        drawGame(g2);
-        if (!player.isAlive()) {
-            drawGameOver(g2);  // Menambahkan tampilan Game Over setelah objek digambar
-        }
-    }
 
+        if (bufferImage == null || bufferImage.getWidth() != getWidth() || bufferImage.getHeight() != getHeight()) {
+            bufferImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        }
+
+        Graphics2D g2d = bufferImage.createGraphics();
+        
+        g2d.drawImage(image, 0, 0, null);  
+        drawBackground(g2d);
+        drawGame(g2d);  
+        
+        if (!player.isAlive()) {
+            drawGameOver(g2d);
+        }
+        
+        g.drawImage(bufferImage, 0, 0, null); 
+        g2d.dispose();
+    }
+    
     private void drawGame(Graphics2D g2) {
-        // Gambar kucing, tikus, laser, dan efek
         if (player.isAlive()) {
             player.draw(g2);
         }
+
         for (Laser laser : lasers) {
-            laser.draw(g2);
+            if (laser != null) {
+                laser.draw(g2);
+            }
         }
+
         for (Mice mouse : mice) {
-            mouse.draw(g2);
+            if (mouse != null) {
+                mouse.draw(g2);
+            }
         }
+
         for (Effect eff : effects) {
-            eff.draw(g2);
+            if (eff != null) {
+                eff.draw(g2);
+            }
         }
+    
+        g2.setColor(Color.BLACK);
+        g2.setFont((new Font("Poppins", Font.BOLD, 20)));
+        g2.drawString("Score: " + score, 10, 25);
     }
+    
 
     private void drawBackground(Graphics2D g2) {
         if (backgroundImage != null) {
@@ -456,7 +496,7 @@ public class GamePanel extends JComponent {
     private void drawGameOver(Graphics2D g2) {
         String text = "GAME OVER";
         String text2 = "Tekan enter untuk mulai lagi";
-        g2.setFont(new Font("Arial", Font.BOLD, 50));
+        g2.setFont(new Font("Poppins", Font.BOLD, 50));
         FontMetrics fm = g2.getFontMetrics();
         Rectangle2D r2 = fm.getStringBounds(text, g2);
     
@@ -466,7 +506,7 @@ public class GamePanel extends JComponent {
         double y = (getHeight() - textHeight) / 2;
     
         g2.drawString(text, (int) x, (int) y + fm.getAscent());
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        g2.setFont(new Font("Poppins", Font.BOLD, 20));
         fm = g2.getFontMetrics();
         r2 = fm.getStringBounds(text2, g2);
         textWidth = r2.getWidth();
