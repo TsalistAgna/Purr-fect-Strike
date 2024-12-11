@@ -3,7 +3,6 @@ public class Key {
     private boolean kiri;
     private boolean spasi;
     private boolean key_j;
-    private boolean key_k;
     private boolean key_enter;
 
     public boolean isKanan(){
@@ -36,14 +35,6 @@ public class Key {
 
     public void setKey_j(boolean key_j){
         this.key_j=key_j;
-    }
-
-    public boolean isKey_k(){
-        return key_k;
-    }
-
-    public void setKey_k(boolean key_k){
-        this.key_k=key_k;
     }
 
     public boolean isKey_enter(){
