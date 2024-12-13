@@ -140,14 +140,14 @@ public class MainMenuPanel extends JPanel {
     private JPanel createLeaderboardPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(0xF6D6D6));
-
+    
         JPanel outerContainer = new JPanel();
         outerContainer.setLayout(new BoxLayout(outerContainer, BoxLayout.Y_AXIS));
         outerContainer.setBackground(new Color(0xF6D6D6));
         outerContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
     
         outerContainer.add(Box.createRigidArea(new Dimension(0, 30)));
-
+    
         JLabel titleLabel = new JLabel("Leaderboard", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Poppins", Font.BOLD, 36));
         titleLabel.setForeground(new Color(0xAB4459));
@@ -155,6 +155,28 @@ public class MainMenuPanel extends JPanel {
         outerContainer.add(titleLabel);
     
         outerContainer.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JPanel headerPanel = new JPanel(new GridLayout(1, 3));
+        headerPanel.setBackground(new Color(0xF6D6D6));
+    
+        JLabel noHeader = new JLabel("No.", SwingConstants.CENTER);
+        noHeader.setFont(new Font("Poppins", Font.BOLD, 18));
+        noHeader.setForeground(new Color(0x333333));
+        headerPanel.add(noHeader);
+    
+        JLabel nameHeader = new JLabel("Nama", SwingConstants.CENTER);
+        nameHeader.setFont(new Font("Poppins", Font.BOLD, 18));
+        nameHeader.setForeground(new Color(0x333333));
+        headerPanel.add(nameHeader);
+    
+        JLabel scoreHeader = new JLabel("Skor", SwingConstants.CENTER);
+        scoreHeader.setFont(new Font("Poppins", Font.BOLD, 18));
+        scoreHeader.setForeground(new Color(0x333333));
+        headerPanel.add(scoreHeader);
+    
+        outerContainer.add(headerPanel);
+
+        // outerContainer.add(Box.createRigidArea(new Dimension(0, 10)));
     
         ArrayList<Score> scores = new ArrayList<>();
         try {
@@ -163,33 +185,26 @@ public class MainMenuPanel extends JPanel {
             e.printStackTrace();
         }
     
-        JPanel scorePanel = new JPanel();
-        scorePanel.setLayout(new BoxLayout(scorePanel, BoxLayout.Y_AXIS));
+        JPanel scorePanel = new JPanel(new GridLayout(scores.size(), 3, 10, 10)); // Grid for rows and columns
         scorePanel.setBackground(new Color(0xF6D6D6));
     
         for (int i = 0; i < scores.size(); i++) {
             Score score = scores.get(i);
-
-            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5));
-            rowPanel.setBackground(new Color(0xF6D6D6));
-            rowPanel.setMaximumSize(new Dimension(400, 40));
     
-            JLabel rankLabel = new JLabel((i + 1) + ".");
+            JLabel rankLabel = new JLabel((i + 1) + ".", SwingConstants.CENTER);
             rankLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
             rankLabel.setForeground(new Color(0x333333));
-            rowPanel.add(rankLabel);
+            scorePanel.add(rankLabel);
     
-            JLabel nameLabel = new JLabel(score.getName());
+            JLabel nameLabel = new JLabel(score.getName(), SwingConstants.CENTER);
             nameLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
             nameLabel.setForeground(new Color(0x555555));
-            rowPanel.add(nameLabel);
+            scorePanel.add(nameLabel);
     
-            JLabel scoreLabel = new JLabel(String.valueOf(score.getScore()));
+            JLabel scoreLabel = new JLabel(String.valueOf(score.getScore()), SwingConstants.CENTER);
             scoreLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
             scoreLabel.setForeground(new Color(0x777777));
-            rowPanel.add(scoreLabel);
-    
-            scorePanel.add(rowPanel);
+            scorePanel.add(scoreLabel);
         }
     
         JScrollPane scrollPane = new JScrollPane(scorePanel);
@@ -199,7 +214,7 @@ public class MainMenuPanel extends JPanel {
         outerContainer.add(scrollPane);
     
         outerContainer.add(Box.createRigidArea(new Dimension(0, 20)));
-
+    
         JButton backButton = new JButton("Back");
         backButton.setFont(new Font("Poppins", Font.BOLD, 18));
         backButton.setBackground(new Color(0xAB4459));
@@ -208,7 +223,7 @@ public class MainMenuPanel extends JPanel {
         backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         backButton.addActionListener(e -> showMainMenu());
         outerContainer.add(backButton);
-
+    
         outerContainer.add(Box.createRigidArea(new Dimension(0, 100)));
     
         panel.add(outerContainer, BorderLayout.CENTER);
