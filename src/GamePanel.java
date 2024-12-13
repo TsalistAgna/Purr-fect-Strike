@@ -52,12 +52,15 @@ public class GamePanel extends JComponent {
     private JButton saveButton;
     private boolean gameOver;
 
+    private MainMenuPanel mainMenuPanel;
+
     int fieldWidth = 200; // Lebar text field
     int fieldHeight = 30; // Tinggi text field
     int buttonWidth = 80; // Lebar tombol
     int buttonHeight = 30; // Tinggi tombol
 
-    public GamePanel() {
+    public GamePanel(MainMenuPanel mainMenuPanel) {
+        this.mainMenuPanel = mainMenuPanel;
         setLayout(null); // Allows absolute positioning for text field and button
 
         // Initialize text field for player name input

@@ -7,7 +7,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import javax.swing.ImageIcon;
 
-public class Cat extends HpRenderImpl implements Object{
+public class Cat extends HpRenderImpl implements Object, Position{
     public static final double CAT_SIZE=64;
     public double x, y;
     private float MAX_SPEED = 1f;

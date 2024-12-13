@@ -1,8 +1,10 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/purrfect_strike";
@@ -40,5 +42,23 @@ public class DatabaseConnection {
         }
         return mice;
     }
+
+    public static ArrayList<Score> getTopScores() throws Exception {
+    ArrayList<Score> scores = new ArrayList<>();
+
+    try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+        String query = "SELECT nama, score FROM players ORDER BY score DESC LIMIT 10";
+        ResultSet rs = stmt.executeQuery(query);
+        while (rs.next()) {
+            String playerName = rs.getString("nama");
+            int score = rs.getInt("score");
+            scores.add(new Score(playerName, score));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return scores;
+}
+
     
 }

@@ -7,7 +7,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import javax.swing.ImageIcon;
 
-public class Mice extends HpRenderImpl implements Object {
+public class Mice extends HpRenderImpl implements Object, Position {
     public static final double MICE_SIZE = 50;
     private double x;
     private double y;

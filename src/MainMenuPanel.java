@@ -9,19 +9,35 @@ public class MainMenuPanel extends JPanel {
     private int currentCatIndex = 0;
     private JLabel catImageLabel;
     private JLabel catNameLabel;
-    private Key key; 
-    private Runnable onStartGame; 
+    private Key key;
+    private Runnable onStartGame;
+
+    private JPanel leaderboardPanel;
+    private JPanel mainMenuPanel;
 
     public MainMenuPanel(Runnable onStartGame) {
         this.onStartGame = onStartGame;
-        this.key = new Key(); 
+        this.key = new Key();
         cats = DatabaseConnection.getCats();
 
-        setLayout(new GridBagLayout());
-        setBackground(new Color(0xF6D6D6));
+        CardLayout cardLayout = new CardLayout();
+        setLayout(cardLayout);
+
+        mainMenuPanel = createMainMenuPanel();
+        add(mainMenuPanel, "MainMenu");
+
+        leaderboardPanel = createLeaderboardPanel();
+        add(leaderboardPanel, "Leaderboard");
+
+        showMainMenu();
+    }
+
+    private JPanel createMainMenuPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(0xF6D6D6));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); 
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.CENTER;
 
@@ -29,15 +45,15 @@ public class MainMenuPanel extends JPanel {
         titleLabel.setFont(new Font("Poppins", Font.BOLD, 48));
         titleLabel.setForeground(new Color(0xAB4459));
         gbc.gridy = 0;
-        gbc.insets = new Insets(20, 10, 40, 10); 
-        add(titleLabel, gbc);
+        gbc.insets = new Insets(20, 10, 40, 10);
+        panel.add(titleLabel, gbc);
 
         JLabel selectCatLabel = new JLabel("Select your cat hunter", SwingConstants.CENTER);
         selectCatLabel.setFont(new Font("Poppins", Font.PLAIN, 24));
         selectCatLabel.setForeground(new Color(0xAB4459));
         gbc.gridy = 1;
-        gbc.insets = new Insets(10, 10, 10, 10); 
-        add(selectCatLabel, gbc);
+        gbc.insets = new Insets(10, 10, 10, 10);
+        panel.add(selectCatLabel, gbc);
 
         JPanel catPanel = new JPanel(new BorderLayout());
         catPanel.setBackground(new Color(0xF6D6D6));
@@ -73,7 +89,7 @@ public class MainMenuPanel extends JPanel {
 
         gbc.gridy = 2;
         gbc.insets = new Insets(10, 10, 10, 10); 
-        add(catPanel, gbc);
+        panel.add(catPanel, gbc);
 
         JButton startButton = new JButton(new ImageIcon(new ImageIcon("Assets\\Images\\Button\\start.png").getImage().getScaledInstance(220, 75, Image.SCALE_SMOOTH)));
         startButton.setFocusPainted(false);
@@ -85,7 +101,17 @@ public class MainMenuPanel extends JPanel {
 
         gbc.gridy = 3;
         gbc.insets = new Insets(15, 10, 10, 10); 
-        add(startButton, gbc);
+        panel.add(startButton, gbc);
+
+        JButton leaderboardButton = new JButton("Leaderboard");
+        leaderboardButton.setFocusPainted(false);
+        leaderboardButton.setBorder(BorderFactory.createEmptyBorder());
+        leaderboardButton.setContentAreaFilled(false);
+        leaderboardButton.addActionListener(e -> showLeaderboard());
+
+        gbc.gridy = 4;
+        gbc.insets = new Insets(15, 10, 10, 10); 
+        panel.add(leaderboardButton, gbc);
 
         if (!cats.isEmpty()) {
             updateCatDisplay();
@@ -105,7 +131,89 @@ public class MainMenuPanel extends JPanel {
                 handleKeyReleased(e.getKeyCode());
             }
         });
+        
         setFocusable(true);
+        
+        return panel;
+    }
+
+    private JPanel createLeaderboardPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(0xF6D6D6));
+
+        JPanel outerContainer = new JPanel();
+        outerContainer.setLayout(new BoxLayout(outerContainer, BoxLayout.Y_AXIS));
+        outerContainer.setBackground(new Color(0xF6D6D6));
+        outerContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+    
+        outerContainer.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        JLabel titleLabel = new JLabel("Leaderboard", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Poppins", Font.BOLD, 36));
+        titleLabel.setForeground(new Color(0xAB4459));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        outerContainer.add(titleLabel);
+    
+        outerContainer.add(Box.createRigidArea(new Dimension(0, 20)));
+    
+        ArrayList<Score> scores = new ArrayList<>();
+        try {
+            scores = DatabaseConnection.getTopScores();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+        JPanel scorePanel = new JPanel();
+        scorePanel.setLayout(new BoxLayout(scorePanel, BoxLayout.Y_AXIS));
+        scorePanel.setBackground(new Color(0xF6D6D6));
+    
+        for (int i = 0; i < scores.size(); i++) {
+            Score score = scores.get(i);
+
+            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5));
+            rowPanel.setBackground(new Color(0xF6D6D6));
+            rowPanel.setMaximumSize(new Dimension(400, 40));
+    
+            JLabel rankLabel = new JLabel((i + 1) + ".");
+            rankLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
+            rankLabel.setForeground(new Color(0x333333));
+            rowPanel.add(rankLabel);
+    
+            JLabel nameLabel = new JLabel(score.getName());
+            nameLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
+            nameLabel.setForeground(new Color(0x555555));
+            rowPanel.add(nameLabel);
+    
+            JLabel scoreLabel = new JLabel(String.valueOf(score.getScore()));
+            scoreLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
+            scoreLabel.setForeground(new Color(0x777777));
+            rowPanel.add(scoreLabel);
+    
+            scorePanel.add(rowPanel);
+        }
+    
+        JScrollPane scrollPane = new JScrollPane(scorePanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setPreferredSize(new Dimension(500, 300));
+        scrollPane.getViewport().setBackground(new Color(0xF6D6D6));
+        outerContainer.add(scrollPane);
+    
+        outerContainer.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JButton backButton = new JButton("Back");
+        backButton.setFont(new Font("Poppins", Font.BOLD, 18));
+        backButton.setBackground(new Color(0xAB4459));
+        backButton.setForeground(Color.WHITE);
+        backButton.setFocusPainted(false);
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backButton.addActionListener(e -> showMainMenu());
+        outerContainer.add(backButton);
+
+        outerContainer.add(Box.createRigidArea(new Dimension(0, 100)));
+    
+        panel.add(outerContainer, BorderLayout.CENTER);
+    
+        return panel;
     }
 
     private void handleKeyPressed(int keyCode) {
@@ -137,6 +245,16 @@ public class MainMenuPanel extends JPanel {
                 key.setSpasi(false);
                 break;
         }
+    }
+
+    private void showMainMenu() {
+        CardLayout cl = (CardLayout) getLayout();
+        cl.show(this, "MainMenu");
+    }
+
+    private void showLeaderboard() {
+        CardLayout cl = (CardLayout) getLayout();
+        cl.show(this, "Leaderboard");
     }
 
     private void showPreviousCat() {

@@ -21,7 +21,7 @@ public class GameFrame extends JFrame {
         MainMenuPanel mainMenuPanel = new MainMenuPanel(this::showGamePanel);
         containerPanel.add(mainMenuPanel, "MainMenu");
 
-        gamePanel = new GamePanel();
+        gamePanel = new GamePanel(mainMenuPanel);
         containerPanel.add(gamePanel, "GamePanel");
 
         add(containerPanel);
