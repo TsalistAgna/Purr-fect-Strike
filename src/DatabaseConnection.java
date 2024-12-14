@@ -77,7 +77,7 @@ public class DatabaseConnection {
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, playerName);
             stmt.setInt(2, score);
-            stmt.executeUpdate(); // Operasi INSERT
+            stmt.executeUpdate();
         }
     }
 }

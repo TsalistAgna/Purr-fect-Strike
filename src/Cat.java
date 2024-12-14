@@ -7,7 +7,6 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.Random;
-
 import javax.swing.ImageIcon;
 
 public class Cat extends HpRenderImpl implements Object, Position{
@@ -132,8 +131,8 @@ public class Cat extends HpRenderImpl implements Object, Position{
 
     public void reset(){
         alive=true;
-        speed=0;
         resetHP();
+        speed=0;
         angle=0;
     }
 }

@@ -56,18 +56,17 @@ public class GamePanel extends JComponent {
 
     private MainMenuPanel mainMenu;
 
-    int fieldWidth = 200; // Lebar text field
-    int fieldHeight = 30; // Tinggi text field
-    int buttonWidth = 80; // Lebar tombol
-    int buttonHeight = 30; // Tinggi tombol
+    int fieldWidth = 200;
+    int fieldHeight = 30;
+    int buttonWidth = 80;
+    int buttonHeight = 30;
 
     public GamePanel(MainMenuPanel mainMenu) {
         this.mainMenu = mainMenu;
-        setLayout(null); // Allows absolute positioning for text field and button
+        setLayout(null);
 
-        // Initialize text field for player name input
         nameField = new JTextField();
-        nameField.setBounds(150, 300, 200, 30); // Positioning text field
+        nameField.setBounds(150, 300, 200, 30);
         nameField.setVisible(false);
         add(nameField);
 
@@ -88,7 +87,7 @@ public class GamePanel extends JComponent {
         
         initObjectGame();
         initKeyboard();
-        requestFocus(); // Pastikan panel menerima fokus
+        requestFocus();
 
         thread = new Thread(() -> {
             while (start) {
@@ -140,12 +139,14 @@ public class GamePanel extends JComponent {
         player.changeLocation(650, 300);
         System.out.println("Lokasi kucing: " + player.getX() + ", " + player.getY());
         effects = new ArrayList<>();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (start) {
-                    addMice();
-                    sleep(3000);
+        new Thread(() -> {
+            while (start) { 
+                addMice();
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
                 }
             }
         }).start();
@@ -155,11 +156,11 @@ public class GamePanel extends JComponent {
         score = 0;
         mice.clear();
         lasers.clear();
+        player.reset();
         player.changeLocation(650, 300);
         nameField.setText("");
-        player.reset();
-        requestFocus(); 
-        initKeyboard(); 
+        requestFocus();
+        initKeyboard();
     }
 
     private void initKeyboard(){
@@ -310,13 +311,13 @@ public class GamePanel extends JComponent {
     private void checkLaser(Laser laser) {
         if (score > 0 && score % 10 == 0 && !isLaserEnlarged) {
             isLaserEnlarged = true;
-            laserEnlargeStartTime = System.currentTimeMillis(); 
+            laserEnlargeStartTime = System.currentTimeMillis();
         }
     
         for (int i = 0; i < mice.size(); i++) {
             Mice mouse = mice.get(i);
             if (mouse != null) {
-                Area area = new Area(laser.getShape());  
+                Area area = new Area(laser.getShape());
                 area.intersect(mouse.getShape());
                 if (!area.isEmpty()) {
                     effects.add(new Effect(laser.getCenterX(), laser.getCenterY(), 3, 5, 60, 0.5f, new Color(230, 207, 105)));

@@ -185,7 +185,7 @@ public class MainMenuPanel extends JPanel {
             e.printStackTrace();
         }
     
-        JPanel scorePanel = new JPanel(new GridLayout(scores.size(), 3, 10, 10)); // Grid for rows and columns
+        JPanel scorePanel = new JPanel(new GridLayout(scores.size(), 3, 10, 10));
         scorePanel.setBackground(new Color(0xF6D6D6));
     
         for (int i = 0; i < scores.size(); i++) {
