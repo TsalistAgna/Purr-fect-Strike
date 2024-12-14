@@ -23,8 +23,10 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class GamePanel extends JComponent {
     private final int FPS = 60;
@@ -52,15 +54,15 @@ public class GamePanel extends JComponent {
     private JButton saveButton;
     private boolean gameOver;
 
-    private MainMenuPanel mainMenuPanel;
+    private MainMenuPanel mainMenu;
 
     int fieldWidth = 200; // Lebar text field
     int fieldHeight = 30; // Tinggi text field
     int buttonWidth = 80; // Lebar tombol
     int buttonHeight = 30; // Tinggi tombol
 
-    public GamePanel(MainMenuPanel mainMenuPanel) {
-        this.mainMenuPanel = mainMenuPanel;
+    public GamePanel(MainMenuPanel mainMenu) {
+        this.mainMenu = mainMenu;
         setLayout(null); // Allows absolute positioning for text field and button
 
         // Initialize text field for player name input
@@ -70,14 +72,6 @@ public class GamePanel extends JComponent {
         add(nameField);
 
         nameField.addActionListener(e -> saveScore());
-
-
-        // Initialize save button
-        // saveButton = new JButton("Save");
-        // saveButton.setBounds(370, 300, 100, 30); // Positioning save button
-        // saveButton.setVisible(false);
-        // saveButton.addActionListener(e -> saveScore());
-        // add(saveButton);
     }
 
     private boolean isLaserEnlarged = false; 
@@ -118,20 +112,28 @@ public class GamePanel extends JComponent {
     
     private void addMice() {
         Random ran = new Random();
-        int locationY = ran.nextInt(Math.max(height - 50, 1)) + 25;
-
-        Mice mouse1 = new Mice();
-        mouse1.changeLocation(0, locationY);
+    
+        ArrayList<String> miceImagePaths = DatabaseConnection.getMiceImagePaths();
+        if (miceImagePaths.isEmpty()) {
+            System.out.println("Tidak ada gambar tikus yang tersedia di database.");
+            return;
+        }
+    
+        int locationY1 = ran.nextInt(Math.max(height - 50, 1)) + 25;
+        String randomImage1 = miceImagePaths.get(ran.nextInt(miceImagePaths.size()));
+        Mice mouse1 = new Mice(randomImage1);
+        mouse1.changeLocation(0, locationY1);
         mouse1.changeAngle(0); 
         mice.add(mouse1);
-
+    
         int locationY2 = ran.nextInt(Math.max(height - 50, 1)) + 25;
-
-        Mice mouse2 = new Mice();
+        String randomImage2 = miceImagePaths.get(ran.nextInt(miceImagePaths.size()));
+        Mice mouse2 = new Mice(randomImage2);
         mouse2.changeLocation(width, locationY2);
-        mouse2.changeAngle(180); 
+        mouse2.changeAngle(180);
         mice.add(mouse2);
     }
+    
 
     private void initObjectGame() {
         sound = new Sound();
@@ -153,13 +155,11 @@ public class GamePanel extends JComponent {
         score = 0;
         mice.clear();
         lasers.clear();
-
         player.changeLocation(650, 300);
         nameField.setText("");
-
         player.reset();
-        requestFocus(); // Pastikan panel menerima fokus
-        initKeyboard(); // Reinitialisasi key listener
+        requestFocus(); 
+        initKeyboard(); 
     }
 
     private void initKeyboard(){
@@ -250,6 +250,7 @@ public class GamePanel extends JComponent {
                     }else{
                         if(key.isKey_enter()){
                             resetGame();
+                            // switchToMainMenuPanel();
                         }
                     }
 
@@ -273,7 +274,6 @@ public class GamePanel extends JComponent {
             }
         }).start();
     }
-
 
     private void checkCat(Mice mice) {
         if (mice != null) {
@@ -349,8 +349,6 @@ public class GamePanel extends JComponent {
             laser.setLaserEnlarged(false);  
         }
     }
-    
-    
     
     private void initLasers(){
         new Thread(new Runnable()  {
@@ -435,32 +433,11 @@ public class GamePanel extends JComponent {
         g2.drawString("Score: " + score, 10, 25);
 
         if(!player.isAlive()){
-
-            // String text = "GAME OVER";
-            // String text2 = "Tekan enter untuk mulai lagi";
-            // g2.setFont(new Font("Arial", Font.BOLD, 50));
-            // FontMetrics fm = g2.getFontMetrics();
-            // Rectangle2D r2 = fm.getStringBounds(text, g2);
             String text = "GAME OVER";
             String text2 = "Tekan enter untuk mulai lagi";
             g2.setFont(new Font("Poppins", Font.BOLD, 50));
             FontMetrics fm = g2.getFontMetrics();
             Rectangle2D r2 = fm.getStringBounds(text, g2);
-
-            // double textWidth = r2.getWidth();
-            // double textHeight = r2.getHeight();
-            // double x = (width - textWidth) / 2;
-            // double y = (height - textHeight) / 2;
-
-            // g2.drawString(text, (int) x, (int) y + fm.getAscent());
-            // g2.setFont(getFont().deriveFont(Font.BOLD, 20));
-            // fm = g2.getFontMetrics();
-            // r2 = fm.getStringBounds(text2, g2);
-            // textWidth = r2.getWidth();
-            // textHeight = r2.getHeight();
-            // x = (width - textWidth) / 2;
-            // y = (height - textHeight) / 2;
-            // g2.drawString(text2, (int) x, (int) y + fm.getAscent() + 50);
             drawGameOver(g2);
         }
     }
@@ -485,24 +462,24 @@ public class GamePanel extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
+    
         if (bufferImage == null || bufferImage.getWidth() != getWidth() || bufferImage.getHeight() != getHeight()) {
             bufferImage = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         }
-
+    
         Graphics2D g2d = bufferImage.createGraphics();
-        
         g2d.drawImage(image, 0, 0, null);  
         drawBackground(g2d);
         drawGame(g2d);  
-        
+    
         if (!player.isAlive()) {
             drawGameOver(g2d);
         }
-        
+    
         g.drawImage(bufferImage, 0, 0, null); 
         g2d.dispose();
     }
+    
     
     private void drawGame(Graphics2D g2) {
         if (player.isAlive()) {
@@ -545,15 +522,17 @@ public class GamePanel extends JComponent {
     public void setGameOver(boolean isGameOver) {
         gameOver = isGameOver;
         nameField.setVisible(isGameOver);
-        // saveButton.setVisible(false); // Tidak perlu tombol save
         if (isGameOver) {
-            nameField.addActionListener(e -> saveScore()); // Tambahkan listener untuk Enter
+            nameField.addActionListener(e -> {
+                saveScore();
+                nameField.setVisible(false);
+            }); 
         } else {
-            nameField.removeActionListener(null); // Hapus listener saat tidak game over
+            nameField.removeActionListener(null);
         }
         repaint();
     }
-    
+
     private void saveScore() {
         String playerName = nameField.getText();
         if (playerName.isEmpty()) {
@@ -561,19 +540,10 @@ public class GamePanel extends JComponent {
             return;
         }
     
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/purrfect_strike", "root", "")) {
-            String query = "INSERT INTO players (nama, score) VALUES (?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setString(1, playerName);
-            stmt.setInt(2, score);
-            stmt.executeUpdate();
-    
-            // JOptionPane.showMessageDialog(this, "Score saved successfully!");
-    
-            // Sembunyikan text field
+        try {
+            DatabaseConnection.savePlayerScore(playerName, score); 
+            
             nameField.setVisible(false);
-    
-            // Reset game state
             resetGame();
             gameOver = false;
         } catch (SQLException ex) {
@@ -581,28 +551,20 @@ public class GamePanel extends JComponent {
             JOptionPane.showMessageDialog(this, "Failed to save score!");
         }
     }
-    
-    // public void setGameOver(boolean isGameOver) {
-    //     gameOver = isGameOver;
-    //     nameField.setVisible(isGameOver);
-    //     saveButton.setVisible(isGameOver);
-    //     repaint();
-    // }
 
     private void drawGameOver(Graphics2D g2) {
         String text = "GAME OVER";
-
-        String text2 = "Masukkan nama anda!!";
-        g2.setFont(new Font("Arial", Font.BOLD, 50));
-
+        String text2 = "Masukkan nama Anda";
+    
+        g2.setFont(new Font("Poppins", Font.BOLD, 50));
         FontMetrics fm = g2.getFontMetrics();
         Rectangle2D r2 = fm.getStringBounds(text, g2);
-
+    
         double textWidth = r2.getWidth();
         double textHeight = r2.getHeight();
         double x = (getWidth() - textWidth) / 2;
         double y = (getHeight() - textHeight) / 2;
-
+    
         g2.drawString(text, (int) x, (int) y + fm.getAscent());
         g2.setFont(new Font("Poppins", Font.BOLD, 20));
         fm = g2.getFontMetrics();
@@ -612,21 +574,14 @@ public class GamePanel extends JComponent {
         x = (getWidth() - textWidth) / 2;
         y = (getHeight() - textHeight) / 2;
         g2.drawString(text2, (int) x, (int) y + fm.getAscent() + 50);
-
-        // Show text field and button
+    
         int fieldX = (getWidth() - fieldWidth) / 2;
-        int fieldY = (int) (y + fm.getAscent() + 70); // Posisi di bawah teks kedua
+        int fieldY = (int) (y + fm.getAscent() + 70); 
         nameField.setBounds(fieldX, fieldY, fieldWidth, fieldHeight);
-
-        // Posisi JButton
-        // int buttonX = fieldX + fieldWidth + 10; // Beri jarak 10px setelah text field
-        // int buttonY = fieldY;
-        // int buttonX = (getWidth() - fieldWidth) / 2;
-        // int buttonY = (int) (y + fm.getAscent() + 70);
-        // saveButton.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
-
-        nameField.setVisible(true);
-        // saveButton.setVisible(true);
+    
+        if (!nameField.isVisible()) {
+            nameField.setVisible(true); 
+            repaint(); 
+        }
     }
-
 }

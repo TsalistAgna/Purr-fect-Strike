@@ -8,7 +8,6 @@ public abstract class HpRender {
         this.hp = hp;
     }
 
-    // Metode abstrak untuk merender HP, harus diimplementasikan di subclass
     protected abstract void hpRender(Graphics2D g2, Shape shape, double y);
 
     public boolean updateHP(double cutHP) {

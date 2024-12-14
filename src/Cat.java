@@ -5,6 +5,9 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
+import java.util.ArrayList;
+import java.util.Random;
+
 import javax.swing.ImageIcon;
 
 public class Cat extends HpRenderImpl implements Object, Position{
@@ -20,15 +23,22 @@ public class Cat extends HpRenderImpl implements Object, Position{
     private boolean alive = true;
     
     public Cat() {
-        super(new HealthPoint (100, 100));
-        try {
-            images = new ImageIcon("Assets\\Images\\Kucing\\1.png")
+        super(new HealthPoint(100, 100));
+
+        ArrayList<String> catImagePaths = DatabaseConnection.getCatsImagePaths();
+
+        if (!catImagePaths.isEmpty()) {
+            try {
+                String randomImagePath = catImagePaths.get(new Random().nextInt(catImagePaths.size()));
+                images = new ImageIcon(randomImagePath)
                         .getImage()
-                        .getScaledInstance(120, 120, Image.SCALE_SMOOTH);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Gagal memuat gambar kucing.");
+                        .getScaledInstance(130, 130, Image.SCALE_SMOOTH);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Gagal memuat gambar kucing.");
+            }
         }
+
         Path2D p = new Path2D.Double();
         p.moveTo(0, 15);
         p.lineTo(20, 5);
@@ -37,6 +47,7 @@ public class Cat extends HpRenderImpl implements Object, Position{
         p.lineTo(0, CAT_SIZE - 15);
         catShape = new Area(p);
     }
+    
 
     public void changeLocation(double x, double y){
         this.x=x;

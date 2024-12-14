@@ -16,18 +16,18 @@ public class Mice extends HpRenderImpl implements Object, Position {
     private Image image;
     private final Area miceShape;
 
-    public Mice() {
-        super(new HealthPoint (20, 20));
-
+    public Mice(String imagePath) {
+        super(new HealthPoint(20, 20));
+    
         try {
-            image = new ImageIcon("Assets\\Images\\Tikus\\tikus1.png")
+            image = new ImageIcon(imagePath)
                     .getImage()
                     .getScaledInstance(80, 80, Image.SCALE_SMOOTH);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Gagal memuat gambar tikus.");
+            System.out.println("Gagal memuat gambar tikus dari: " + imagePath);
         }
-
+    
         Path2D p = new Path2D.Double();
         p.moveTo(0, MICE_SIZE / 2);
         p.lineTo(15, 10);
@@ -37,6 +37,7 @@ public class Mice extends HpRenderImpl implements Object, Position {
         p.lineTo(15, MICE_SIZE - 10);
         miceShape = new Area(p);
     }
+    
 
     public void changeLocation(double x, double y) {
         this.x = x;

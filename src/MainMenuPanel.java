@@ -45,15 +45,15 @@ public class MainMenuPanel extends JPanel {
         titleLabel.setFont(new Font("Poppins", Font.BOLD, 48));
         titleLabel.setForeground(new Color(0xAB4459));
         gbc.gridy = 0;
-        gbc.insets = new Insets(20, 10, 40, 10);
+        gbc.insets = new Insets(20, 10, 20, 10);
         panel.add(titleLabel, gbc);
 
-        JLabel selectCatLabel = new JLabel("Select your cat hunter", SwingConstants.CENTER);
-        selectCatLabel.setFont(new Font("Poppins", Font.PLAIN, 24));
-        selectCatLabel.setForeground(new Color(0xAB4459));
+        JLabel catLabel = new JLabel("The hunter cat character will be selected randomly", SwingConstants.CENTER);
+        catLabel.setFont(new Font("Poppins", Font.PLAIN, 24));
+        catLabel.setForeground(new Color(0xAB4459));
         gbc.gridy = 1;
         gbc.insets = new Insets(10, 10, 10, 10);
-        panel.add(selectCatLabel, gbc);
+        panel.add(catLabel, gbc);
 
         JPanel catPanel = new JPanel(new BorderLayout());
         catPanel.setBackground(new Color(0xF6D6D6));
@@ -103,7 +103,7 @@ public class MainMenuPanel extends JPanel {
         gbc.insets = new Insets(15, 10, 10, 10); 
         panel.add(startButton, gbc);
 
-        JButton leaderboardButton = new JButton("Leaderboard");
+        JButton leaderboardButton = new JButton(new ImageIcon(new ImageIcon("Assets\\Images\\Button\\leaderboard.png").getImage().getScaledInstance(220, 75, Image.SCALE_SMOOTH)));
         leaderboardButton.setFocusPainted(false);
         leaderboardButton.setBorder(BorderFactory.createEmptyBorder());
         leaderboardButton.setContentAreaFilled(false);
@@ -262,7 +262,7 @@ public class MainMenuPanel extends JPanel {
         }
     }
 
-    private void showMainMenu() {
+    public void showMainMenu() {
         CardLayout cl = (CardLayout) getLayout();
         cl.show(this, "MainMenu");
     }
